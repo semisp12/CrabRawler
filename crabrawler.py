@@ -95,6 +95,7 @@ class CrabRawler(scrapy.Spider):
         "CONCURRENT_REQUESTS": 1,       # orden garantizado entre fases
         "HTTPERROR_ALLOW_ALL":  True,    # no descartar nada por código HTTP
         "ROBOTSTXT_OBEY":       False,   # en pentest ético revisamos robots.txt a mano
+        "USER_AGENT":           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
     }
 
     # ── Init ──────────────────────────────────────────────────────────────────
