@@ -83,7 +83,7 @@ MODO DE USO Y EJEMPLO DE EJECUCIÓN
 ----------------------------------
 Para iniciar la herramienta, ejecuta el script desde la consola del sistema:
 
-   $ python example_spider.py
+   $ python crabrawler.py
 
 A continuación se muestra un ejemplo real de cómo luce la interacción en la
 terminal durante un testeo rápido:
