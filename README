@@ -1,0 +1,135 @@
+======================================================================
+  CrabRawler v1.0 — Web Reconnaissance Spider
+======================================================================
+
+DESCRIPCIÓN
+-----------
+CrabRawler es una araña de reconocimiento web basada en el framework
+Scrapy, diseñada específicamente para tareas de auditoría de seguridad
+y OSINT (Open Source Intelligence). 
+
+Esta herramienta ha sido concebida bajo una filosofía "lightweight": 
+es un script sencillo, directo, libre de dependencias complejas y sin un
+exceso de características (features) pesadas. Su único propósito es 
+proporcionar un vistazo rápido y preliminar de la superficie expuesta 
+de la página web testeada.
+
+FLUJO DE EJECUCIÓN Y METODOLOGÍA POR FASES
+------------------------------------------
+El reconocimiento se ejecuta de manera estrictamente secuencial a través
+de las siguientes etapas:
+
+* FASE 1 — Entrada y Validación de Entorno (Robots y Sitemap Raw)
+  La araña arranca validando la URL e inspeccionando el archivo robots.txt 
+  para extraer reglas de exclusión (Disallow). Acto seguido, localiza y 
+  descarga el sitemap.xml principal en bruto. En esta misma fase se activa 
+  un analizador dinámico que detecta si el sitemap utiliza dominios de 
+  plantilla o placeholders incorrectos, corrigiéndolos en memoria antes 
+  de proceder para no perder el rastro del objetivo real.
+
+* FASE 2 — Indexación Estructurada (Sitemap Parseado)
+  Una vez validado el mapa del sitio, el script procesa de forma recursiva 
+  todos los sub-sitemaps indexados y unifica las URLs en un buffer. Se 
+  lanza una tanda de peticiones asíncronas respetando el nivel de sigilo 
+  seleccionado (delays de 1 a 5 con AutoThrottle o sin límites) para 
+  extraer de forma limpia los códigos de estado HTTP, los títulos de las 
+  páginas y los primeros 3000 caracteres de cada cuerpo de texto.
+
+* FASE 3 — Descubrimiento Agresivo y Cierre (Fuerza Bruta HTML)
+  Con la estructura oficial indexada, la araña pasa al rastreo profundo 
+  mediante el parseo de etiquetas de enlace (a href) dentro del código HTML. 
+  Aquí se descartan elementos irrelevantes (javascript, tel, mailto) y se 
+  aíslan enlaces internos que apunten a extensiones críticas y archivos 
+  sensibles (.env, .conf, .bak, .sql, .zip, entre otros). Al finalizar 
+  esta fase, el spider cierra el proceso y vuelca de forma nativa todo el 
+  historial capturado en un único archivo estructurado JSON.
+
+* FASE 4 — Análisis Técnico Posterior (Trabajo Manual Obligatorio)
+  Esta es la fase definitiva y externa al script. Los datos consolidados 
+  en el JSON sirven únicamente como una radiografía veloz y preliminar del 
+  objetivo. CrabRawler no busca ni puede reemplazar el criterio del auditor; 
+  tras su ejecución, es imperativo iniciar el trabajo manual para verificar 
+  falsos positivos, estudiar los puntos débiles detectados e iniciar la 
+  fase profunda de explotación o consultoría que el factor humano requiere.
+
+GUÍA DE INSTALACIÓN (REQUIREMENTS.TXT)
+--------------------------------------
+Para ejecutar este script necesitas Python 3.8 o superior instalado. Abre 
+una terminal en el directorio del proyecto y elige uno de los siguientes 
+métodos de instalación:
+
+Método A: Instalación directa en el sistema (Rápida)
+   Basta con lanzar el instalador de paquetes de Python apuntando al archivo:
+   $ pip install -r requirements.txt
+   
+   (En sistemas Linux/macOS si conviven varias versiones, usa: 
+    python3 -m pip install -r requirements.txt)
+
+Método B: Instalación aislada en Entorno Virtual (Recomendado)
+   Ideal para evitar conflictos con otras librerías del sistema operativo:
+   
+   1. Crear el entorno virtual:
+      $ python3 -m venv venv
+      
+   2. Activar el entorno según tu sistema:
+      - Linux / macOS : source venv/bin/activate
+      - Windows (CMD) : venv\Scripts\activate.bat
+      - Windows (PS)  : .\venv\Scripts\Activate.ps1
+      
+   3. Instalar dependencias dentro del entorno activo:
+      (venv) $ pip install -r requirements.txt
+
+MODO DE USO Y EJEMPLO DE EJECUCIÓN
+----------------------------------
+Para iniciar la herramienta, ejecuta el script desde la consola del sistema:
+
+   $ python example_spider.py
+
+A continuación se muestra un ejemplo real de cómo luce la interacción en la
+terminal durante un testeo rápido:
+
+   [?] URL objetivo (ej: https://ejemplo.com/ruta): https://testphp.vulnweb.com
+   
+   Nivel de agresividad:
+      [1] Sigilo total    · delay 5s   · recomendado con IDS/WAF
+      [2] Cauteloso       · delay 3s
+      [3] Normal          · delay 1s
+      [4] Agresivo        · delay 0.5s
+      [5] Sin límite      · sin delay
+
+   [?] Nivel (1-5): 3
+   [?] Archivo de salida [results.json]: auditoria_rapida.json
+
+   [*] Objetivo    : https://testphp.vulnweb.com
+   [*] Agresividad : [3] Normal          · delay 1s
+   [*] Salida      : auditoria_rapida.json
+
+   [+] Dominio real detectado: https://testphp.vulnweb.com
+   [+] [robots.txt] Procesando disallows encontrados...
+   [+] [FASE 1] HTTP 200 — https://testphp.vulnweb.com/sitemap.xml
+   [+] [FASE 2] 12 URLs encontradas en el mapa del sitio. Procesando...
+   [+] [FASE 3] Iniciando fuerza bruta por enlaces HTML...
+   [+] Enlace interesante detectado: https://testphp.vulnweb.com/backup.sql
+   
+   [+] 42 registros → auditoria_rapida.json
+   [+] Spider cerrado: finished
+
+ESTRUCTURA DE SALIDA
+--------------------
+El archivo JSON final guarda los registros bajo la siguiente estructura:
+
+  {
+    "fase": 3,
+    "url": "https://target.local/admin",
+    "status": 200,
+    "titulo": "Admin Dashboard",
+    "contenido": "... (primeros 3000 caracteres) ..."
+  }
+
+AVISO LEGAL
+-----------
+Esta herramienta ha sido desarrollada exclusivamente con fines educativos 
+y de auditoría autorizada (Pentesting Ético). El uso de este software contra 
+objetivos sin consentimiento previo es estrictamente ilegal. El desarrollador 
+no se hace responsable del uso indebido de la misma.
+======================================================================

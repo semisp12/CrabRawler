@@ -7,10 +7,14 @@
  ╚██████╗██║  ██║██║  ██║██████╔╝██║  ██║██║  ██║╚███╔███╔╝███████╗███████╗██║  ██║
   ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝ ╚══╝╚══╝ ╚══════╝╚══════╝╚═╝  ╚═╝
 
-  [ PLACEHOLDER — pon aquí tu ASCII art ]
+  [ __      __
+   (  \____/  )      C R A B R A W L E R 
+    \__ oo __/     -------------------------
+     /      \      [ Status: Ready to pinch ]
+ ]
 
   CrabRawler v1.0  ·  Web Reconnaissance Spider
-  Uso: python example_spider.py
+  Uso: python crabrawler.py
 """
 
 import json
